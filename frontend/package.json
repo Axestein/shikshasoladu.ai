@@ -10,8 +10,16 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@mediapipe/camera_utils": "^0.3.1675466862",
+    "@mediapipe/hands": "^0.4.1675469240",
+    "chart.js": "^4.4.8",
+    "framer-motion": "^12.5.0",
+    "frontend": "file:",
+    "lucide-react": "^0.479.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-icons": "^5.5.0",
+    "react-player": "^2.16.0",
     "react-router-dom": "^7.3.0"
   },
   "devDependencies": {
