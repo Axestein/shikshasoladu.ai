@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Hands, HAND_CONNECTIONS } from "@mediapipe/hands";
 import { Camera } from "@mediapipe/camera_utils";
+import atozsignlang from "../assets/atozsignlang.jpg";
 
 export default function SignLanguageDetection() {
   const videoRef = useRef(null);
@@ -328,29 +329,39 @@ export default function SignLanguageDetection() {
     // If no letter is detected
     return "";
   };
-
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
       <h2 className="text-2xl font-bold text-blue-600 mb-4">
         Sign Language Detection
       </h2>
-      <div className="relative w-full max-w-md mx-auto">
-        <video
-          ref={videoRef}
-          className="w-full h-auto rounded-lg"
-          autoPlay
-          playsInline
-        ></video>
-        <canvas
-          ref={canvasRef}
-          className="absolute top-0 left-0 w-full h-full"
-          width={640}
-          height={480}
-        ></canvas>
+      <div className="flex items-center justify-between space-x-1">
+        <div className="relative w-full max-w-md">
+          <video
+            ref={videoRef}
+            className="w-full h-auto rounded-lg"
+            autoPlay
+            playsInline
+          ></video>
+          <canvas
+            ref={canvasRef}
+            className="absolute top-0 left-0 w-full h-full"
+            width={640}
+            height={480}
+          ></canvas>
+        </div>
+
+        <div className="flex-none w-1/5">
+          <img
+            src={atozsignlang}
+            alt="Sign Language Image"
+            className="w-full h-auto rounded-lg shadow-md"
+          />
+        </div>
       </div>
+      
       <p className="text-gray-700 mt-4 text-center">
         Detected Letter: <span className="font-bold text-blue-600">{detectedLetter}</span>
       </p>
     </div>
   );
-}
+};

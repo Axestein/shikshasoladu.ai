@@ -12,6 +12,7 @@
   "dependencies": {
     "@mediapipe/camera_utils": "^0.3.1675466862",
     "@mediapipe/hands": "^0.4.1675469240",
+    "axios": "^1.8.3",
     "chart.js": "^4.4.8",
     "framer-motion": "^12.5.0",
     "frontend": "file:",
