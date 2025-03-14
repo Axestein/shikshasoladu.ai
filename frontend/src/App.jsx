@@ -4,7 +4,7 @@ import Home1 from "../src/page/Alluser/Home1";
 import Home from "./page/Home";
 import Deaf from "./page/Deaf/Deaf";
 import Blind from "./page/Blind/Blind";
-import Dashboard from "./page/Deaf/Dashboard";
+import Dashboard from "./page/Deaf/pages/Dashboard";
 import SignLanguage from "./page/Deaf/pages/SignLanguage";
 import VisualLearning from "./page/Deaf/pages/VisualLearning";
 import Gamification from "./page/Deaf/pages/Gamification";
