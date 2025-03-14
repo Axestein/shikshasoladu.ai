@@ -19,6 +19,7 @@ export default function App() {
         <Route path="/deaf" element={<Deaf />} />
         <Route path="/blind" element={<Blind />} />
         <Route path="/home" element={<Home />} />
+
         <Route path="/allusers" element={<Home1 />} />
         <Route path="/dashboard-deaf" element={<Dashboard />} />
         <Route path="/signlang" element={<SignLanguage />} />
@@ -26,6 +27,7 @@ export default function App() {
         <Route path="/gamification-deaf" element={<Gamification />} />
         <Route path="/community-deaf" element={<Community />} />
         <Route path="/accessibility" element={<Accessibility />} />
+        
       </Routes>
     </Router>
   );

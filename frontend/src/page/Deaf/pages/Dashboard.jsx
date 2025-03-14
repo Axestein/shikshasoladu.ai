@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { BarChart, LineChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { Calendar, Award, Clock, Book, Video, MessageSquare, Star, Users, Zap } from "lucide-react";
+import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
 
 export default function Dashboard() {
@@ -36,10 +37,10 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("progress");
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-gray-50">
+      <Sidebar />
       <Navbar />
-      
-      <div className="container mx-auto p-6">
+      <div className="flex-1 ml-64 mt-20 container p-6">
         <header className="flex justify-between items-center mb-8">
           <h1 className="text-4xl font-bold text-indigo-700">Your Learning Dashboard</h1>
           <div className="bg-indigo-100 rounded-full p-3 text-indigo-700 font-semibold flex items-center gap-2">

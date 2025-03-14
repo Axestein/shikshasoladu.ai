@@ -1,23 +1,28 @@
+// VisualLearning.jsx
 import React from "react";
 import VideoLesson from "../components/VideoLesson";
 import VisualAid from "../components/VisualAid";
 import InteractiveQuiz from "../components/InteractiveQuiz";
+import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
 
 export default function VisualLearning() {
   return (
-    <div>
-    <Navbar />
-    <div className="min-h-screen bg-gray-100 p-6">
-      <h1 className="text-4xl font-bold text-blue-600 mb-8">
-        Visual Learning Tools
-      </h1>
-      <div className="space-y-8">
-        <VideoLesson />
-        <VisualAid />
-        <InteractiveQuiz />
+    <div className="flex min-h-screen bg-gray-100">
+      {/* Sidebar */}
+      <Sidebar />
+      <Navbar />
+      {/* Main Content */}
+      <div className="flex-1 ml-64 p-6 mt-20 bg-white">
+        <h1 className="text-4xl font-bold text-blue-600 mb-8">Visual Learning Tools</h1>
+        
+        {/* Content */}
+        <div className="space-y-8">
+          <VideoLesson />
+          <VisualAid />
+          <InteractiveQuiz />
+        </div>
       </div>
-    </div>
     </div>
   );
 }

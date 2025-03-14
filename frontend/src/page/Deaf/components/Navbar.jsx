@@ -1,59 +1,34 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Home, BarChart2, Clipboard, Eye, Award, Users, Settings } from "lucide-react";
+import { Search, User } from "lucide-react";  // Import Search and User icons
 
 export default function Navbar() {
   return (
-    <nav className="bg-indigo-700 p-4 shadow-lg">
-      <div className="container mx-auto flex flex-wrap justify-between items-center">
+    <nav className="bg-indigo-700 p-4 shadow-lg fixed w-full z-10 top-0 left-0">
+      <div className="container mx-auto flex justify-between items-center">
+        
+        {/* Left Side - Brand */}
         <Link to="/" className="text-white text-2xl font-bold flex items-center gap-2">
           <span className="text-yellow-300">Shiksha</span>Soladu.ai
         </Link>
-        
-        <ul className="flex flex-wrap gap-4 md:gap-6 items-center">
-          <li>
-            <Link to="/deaf" className="text-white hover:text-yellow-300 flex items-center gap-1 transition duration-300">
-              <Home size={18} />
-              <span>Home</span>
-            </Link>
-          </li>
-          <li>
-            <Link to="/dashboard-deaf" className="text-white hover:text-yellow-300 flex items-center gap-1 transition duration-300">
-              <BarChart2 size={18} />
-              <span>Dashboard</span>
-            </Link>
-          </li>
-          <li>
-            <Link to="/signlang" className="text-white hover:text-yellow-300 flex items-center gap-1 transition duration-300">
-              <Clipboard size={18} />
-              <span>Sign Language</span>
-            </Link>
-          </li>
-          <li>
-            <Link to="/visual-learning" className="text-white hover:text-yellow-300 flex items-center gap-1 transition duration-300">
-              <Eye size={18} />
-              <span>Visual Learning</span>
-            </Link>
-          </li>
-          <li>
-            <Link to="/gamification-deaf" className="text-white hover:text-yellow-300 flex items-center gap-1 transition duration-300">
-              <Award size={18} />
-              <span>Gamification</span>
-            </Link>
-          </li>
-          <li>
-            <Link to="/community-deaf" className="text-white hover:text-yellow-300 flex items-center gap-1 transition duration-300">
-              <Users size={18} />
-              <span>Community</span>
-            </Link>
-          </li>
-          <li>
-            <Link to="/accessibility" className="text-white hover:text-yellow-300 flex items-center gap-1 transition duration-300">
-              <Settings size={18} />
-              <span>Accessibility</span>
-            </Link>
-          </li>
-        </ul>
+
+        {/* Right Side - Search Box and Profile Icon */}
+        <div className="flex items-center gap-6">
+          {/* Search Box */}
+          <div className="flex items-center bg-white p-2 rounded-lg shadow-md max-w-xs">
+            <Search size={18} className="text-gray-500" />
+            <input
+              type="text"
+              placeholder="Search"
+              className="ml-2 w-full bg-transparent outline-none text-gray-700"
+            />
+          </div>
+
+          {/* Profile Icon */}
+          <div className="flex items-center">
+            <User size={24} className="text-white hover:text-yellow-300 cursor-pointer" />
+          </div>
+        </div>
       </div>
     </nav>
   );
