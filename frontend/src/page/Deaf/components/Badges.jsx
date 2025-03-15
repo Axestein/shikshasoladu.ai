@@ -11,15 +11,26 @@ export default function Badges() {
   }, []);
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold text-blue-600 mb-4">Badges</h2>
-      <div className="grid grid-cols-3 gap-4">
+    <div className="bg-white p-8 rounded-xl shadow-lg max-w-md mx-auto mt-10">
+      <h2 className="text-3xl font-extrabold text-blue-700 mb-6 text-center">
+        Achievements
+      </h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {badges.map((badge, index) => (
-          <div key={index} className="text-center">
-            {badge === "Gold" && <FaTrophy className="text-6xl text-yellow-400 mx-auto" />}
-            {badge === "Silver" && <FaMedal className="text-6xl text-gray-400 mx-auto" />}
-            {badge === "Bronze" && <FaAward className="text-6xl text-yellow-600 mx-auto" />}
-            <span className="text-gray-700">{badge}</span>
+          <div
+            key={index}
+            className="flex flex-col items-center p-4 bg-gray-100 rounded-lg shadow-sm transition-transform transform hover:scale-105"
+          >
+            {badge === "Gold" && (
+              <FaTrophy className="text-7xl text-yellow-500 mb-2" />
+            )}
+            {badge === "Silver" && (
+              <FaMedal className="text-7xl text-gray-500 mb-2" />
+            )}
+            {badge === "Bronze" && (
+              <FaAward className="text-7xl text-orange-600 mb-2" />
+            )}
+            <span className="text-gray-800 font-semibold">{badge}</span>
           </div>
         ))}
       </div>
