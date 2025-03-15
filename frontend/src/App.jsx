@@ -11,6 +11,8 @@ import Gamification from "./page/Deaf/pages/Gamification";
 import Community from "./page/Deaf/pages/Community";
 import Accessibility from "./page/Deaf/pages/Accessibility";
 import DProfile from "./page/Deaf/components/DProfile";
+import Canvas from "./page/Deaf/pages/Canvas";
+import Signgame from "./page/Deaf/components/Signgame";
 
 export default function App() {
   return (
@@ -29,6 +31,8 @@ export default function App() {
         <Route path="/community-deaf" element={<Community />} />
         <Route path="/accessibility" element={<Accessibility />} />
         <Route path="/dprofile" element={<DProfile />} />
+        <Route path="/canvas" element={<Canvas />} />
+        <Route path="/signgame" element={<Signgame />} />
       </Routes>
     </Router>
   );
