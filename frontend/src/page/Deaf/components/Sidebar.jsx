@@ -1,7 +1,6 @@
-// Sidebar.jsx
 import React from "react";
 import { Link } from "react-router-dom";
-import { Home, BarChart2, Clipboard, Eye, Award, Users, Settings } from "lucide-react";
+import { Home, BarChart2, Clipboard, Eye, Award, Users, Settings, UserCircle } from "lucide-react"; // Import UserCircle icon
 
 export default function Sidebar() {
   return (
@@ -52,6 +51,12 @@ export default function Sidebar() {
           <Link to="/accessibility" className="text-white hover:text-yellow-300 flex items-center gap-2 transition duration-300 px-6 py-2">
             <Settings size={18} />
             <span>Accessibility</span>
+          </Link>
+        </li>
+        <li>
+          <Link to="/dprofile" className="text-white hover:text-yellow-300 flex items-center gap-2 transition duration-300 px-6 py-2">
+            <UserCircle size={18} /> {/* Replaced Settings icon with UserCircle */}
+            <span>Profile</span>
           </Link>
         </li>
       </ul>

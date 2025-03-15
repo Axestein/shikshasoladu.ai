@@ -25,9 +25,11 @@ export default function Navbar() {
           </div>
 
           {/* Profile Icon */}
-          <div className="flex items-center">
+          <Link to="/dprofile">
+          <span className="flex items-center">
             <User size={24} className="text-white hover:text-yellow-300 cursor-pointer" />
-          </div>
+          </span>
+          </Link>
         </div>
       </div>
     </nav>

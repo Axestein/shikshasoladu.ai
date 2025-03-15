@@ -10,6 +10,7 @@ import VisualLearning from "./page/Deaf/pages/VisualLearning";
 import Gamification from "./page/Deaf/pages/Gamification";
 import Community from "./page/Deaf/pages/Community";
 import Accessibility from "./page/Deaf/pages/Accessibility";
+import DProfile from "./page/Deaf/components/DProfile";
 
 export default function App() {
   return (
@@ -27,7 +28,7 @@ export default function App() {
         <Route path="/gamification-deaf" element={<Gamification />} />
         <Route path="/community-deaf" element={<Community />} />
         <Route path="/accessibility" element={<Accessibility />} />
-        
+        <Route path="/dprofile" element={<DProfile />} />
       </Routes>
     </Router>
   );
