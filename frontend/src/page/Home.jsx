@@ -6,52 +6,44 @@ export default function Home() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if the browser supports the Web Speech API
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
       console.log("Speech recognition not supported in this browser.");
       return;
     }
 
-    // Initialize speech recognition
     const recognition = new SpeechRecognition();
-    recognition.continuous = false; // Stop after one command
-    recognition.interimResults = false; // Only final results
-    recognition.lang = "en-US"; // Set language
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = "en-US";
 
-    // Start listening
     recognition.start();
 
-    // Event handler for when speech is recognized
     recognition.onresult = (event) => {
       const transcript = event.results[0][0].transcript.toLowerCase();
       console.log("You said:", transcript);
 
-      // Check for the specific command
       if (transcript.includes("take me to the blind page")) {
-        navigate("/blind"); // Navigate to the blind page
+        navigate("/blind");
       }
     };
 
-    // Handle errors
     recognition.onerror = (event) => {
       console.error("Speech recognition error:", event.error);
     };
 
-    // Cleanup on component unmount
     return () => {
       recognition.stop();
     };
   }, [navigate]);
 
-  // Rest of your existing code...
   const CustomNavbar = () => (
     <nav className="w-full bg-indigo-700 p-4 shadow-lg fixed top-0 z-10">
       <div className="container mx-auto flex justify-between items-center">
         <Link to="/" className="text-white text-2xl font-bold flex items-center gap-2">
           <span className="text-yellow-300">Shiksha</span>Soladu.ai
         </Link>
-        
+
         <ul className="hidden md:flex space-x-6">
           <li>
             <Link to="/" className="text-white hover:text-yellow-300 flex items-center gap-1 transition duration-300">
@@ -83,7 +75,7 @@ export default function Home() {
             </Link>
           </li>
         </ul>
-        
+
         <button className="md:hidden text-white">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -96,9 +88,9 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-indigo-50">
       <CustomNavbar />
-      
+
       {/* Hero Section */}
-      <div className="pt-24 pb-16 px-4 md:pt-20 md:pb-24">
+      <div className="pt-24 pb-16 px-4 md:pt-28 md:pb-24">
         <div className="container mx-auto text-center">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-indigo-800 mb-6 leading-tight">
             Inclusive Learning for <span className="text-yellow-500">Everyone</span>
@@ -106,7 +98,7 @@ export default function Home() {
           <p className="text-xl text-gray-700 mb-10 max-w-3xl mx-auto">
             Personalized education technology designed for deaf and blind learners, making quality education accessible to all.
           </p>
-          
+
           <div className="max-w-5xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
               {/* Deaf Community Card */}
@@ -151,7 +143,7 @@ export default function Home() {
                   </Link>
                 </div>
               </div>
-              
+
               {/* Blind Community Card */}
               <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all overflow-hidden group">
                 <div className="bg-purple-600 h-2 w-full"></div>
@@ -194,7 +186,7 @@ export default function Home() {
                   </Link>
                 </div>
               </div>
-              
+
               {/* All Users Card */}
               <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all overflow-hidden group">
                 <div className="bg-teal-600 h-2 w-full"></div>
@@ -241,7 +233,6 @@ export default function Home() {
           </div>
         </div>
       </div>
-      
     </div>
   );
 }
