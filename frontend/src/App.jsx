@@ -13,6 +13,8 @@ import Accessibility from "./page/Deaf/pages/Accessibility";
 import DProfile from "./page/Deaf/components/DProfile";
 import Canvas from "./page/Deaf/pages/Canvas";
 import Signgame from "./page/Deaf/components/Signgame";
+import Meet from "./page/Deaf/pages/Meet";
+import PlanYourDay from "./page/Deaf/pages/PlanYourDay";
 
 export default function App() {
   return (
@@ -33,6 +35,8 @@ export default function App() {
         <Route path="/dprofile" element={<DProfile />} />
         <Route path="/canvas" element={<Canvas />} />
         <Route path="/signgame" element={<Signgame />} />
+        <Route path="/deaf-meet" element={<Meet />} />
+        <Route path="/deaf-planyourday" element={<PlanYourDay />} />
       </Routes>
     </Router>
   );
