@@ -3,6 +3,7 @@ import { Hands, HAND_CONNECTIONS } from "@mediapipe/hands";
 import { Camera } from "@mediapipe/camera_utils";
 import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
+import handscan from "../assets/handscan.jpg";
 
 export default function SignLanguageGame() {
   const videoRef = useRef(null);
@@ -11,7 +12,8 @@ export default function SignLanguageGame() {
   const [targetLetter, setTargetLetter] = useState("");
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(10); // 10-second timer
-  const [isGameActive, setIsGameActive] = useState(true);
+  const [isGameActive, setIsGameActive] = useState(false); // Game starts inactive
+  const [isLoading, setIsLoading] = useState(true); // Loading screen state
 
   // Generate a random letter (A-Z)
   const generateRandomLetter = () => {
@@ -22,12 +24,14 @@ export default function SignLanguageGame() {
 
   // Initialize the game
   useEffect(() => {
-    generateRandomLetter();
-  }, []);
+    if (isGameActive) {
+      generateRandomLetter();
+    }
+  }, [isGameActive]);
 
   // Timer logic
   useEffect(() => {
-    if (timeLeft === 0) {
+    if (!isGameActive || timeLeft === 0) {
       setIsGameActive(false); // End the game
       return;
     }
@@ -37,7 +41,7 @@ export default function SignLanguageGame() {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [timeLeft]);
+  }, [timeLeft, isGameActive]);
 
   // Check if the detected letter matches the target letter
   useEffect(() => {
@@ -50,8 +54,7 @@ export default function SignLanguageGame() {
 
   // Hand detection logic
   useEffect(() => {
-    if (!videoRef.current) {
-      console.error("Video element not found!");
+    if (!videoRef.current || !isGameActive) {
       return;
     }
 
@@ -98,7 +101,7 @@ export default function SignLanguageGame() {
     return () => {
       camera.stop();
     };
-  }, []);
+  }, [isGameActive]);
 
   // Function to draw hand landmarks on the canvas
   const drawLandmarks = (ctx, landmarks) => {
@@ -379,58 +382,80 @@ export default function SignLanguageGame() {
     return "";
   };
 
+  // Start the game
+  const startGame = () => {
+    setIsLoading(false); // Hide loading screen
+    setIsGameActive(true); // Start the game
+  };
+
   return (
-    <div className="flex h-screen ml-96 mt-20 bg-gray-100">
+    <div className="flex h-screen ml-60 mt-14 bg-gray-100">
       {/* Sidebar */}
       <Sidebar />
-      
+
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Navbar */}
         <Navbar />
 
-        <div className="flex flex-grow">
-          {/* Left Side: Detected Letter */}
-          <div className="w-1/3 p-4 overflow-hidden">
-            <h2 className="text-2xl font-bold text-blue-600 mb-4">Detected Letter</h2>
-            <div className="relative">
-              <video
-                ref={videoRef}
-                className="w-full h-auto rounded-lg"
-                autoPlay
-                playsInline
-              ></video>
-              <canvas
-                ref={canvasRef}
-                className="absolute top-0 left-0 w-full h-full"
-                width={320}
-                height={240}
-              ></canvas>
-            </div>
-            <p className="text-gray-700 mt-4">
-              Detected Letter: <span className="font-bold text-blue-600">{detectedLetter}</span>
-            </p>
+        {/* Loading Screen */}
+        {isLoading && (
+          <div className="flex flex-col items-center justify-center h-full bg-cyan-950">
+            <img src={handscan} alt="Hand Scan" className=" w-full h-3/4 mb-8" />
+            <button
+              onClick={startGame}
+              className="bg-cyan-600 text-white px-6 py-3 rounded-lg hover:bg-cyan-500 transition duration-300"
+            >
+              Let's Play a Game
+            </button>
           </div>
+        )}
 
-          {/* Right Side: Game Interface */}
-          <div className="w-1/2 p-4 bg-white">
-            <h2 className="text-2xl font-bold text-blue-600 mb-4">Sign Language Game</h2>
-            <div className="text-center">
-              <p className="text-xl font-semibold mb-4">
-                Show the sign for: <span className="text-4xl font-bold text-green-600">{targetLetter}</span>
+        {/* Game Interface */}
+        {!isLoading && (
+          <div className="ml-10 mt-5 flex flex-grow">
+            {/* Left Side: Detected Letter */}
+            <div className="w-1/2 p-4 overflow-hidden">
+              <h2 className="text-2xl font-bold text-blue-600 mb-4">Detected Letter</h2>
+              <div className="relative">
+                <video
+                  ref={videoRef}
+                  className="w-full h-auto rounded-lg"
+                  autoPlay
+                  playsInline
+                ></video>
+                <canvas
+                  ref={canvasRef}
+                  className="absolute top-0 left-0 w-full h-full"
+                  width={320}
+                  height={240}
+                ></canvas>
+              </div>
+              <p className="text-gray-700 mt-4">
+                Detected Letter: <span className="font-bold text-blue-600">{detectedLetter}</span>
               </p>
-              <p className="text-gray-700 mb-4">
-                Score: <span className="font-bold text-blue-600">{score}</span>
-              </p>
-              <p className="text-gray-700 mb-4">
-                Time Left: <span className="font-bold text-red-600">{timeLeft}</span> seconds
-              </p>
-              {!isGameActive && (
-                <p className="text-red-600 font-bold text-xl">Time's up! Game Over.</p>
-              )}
+            </div>
+
+            {/* Right Side: Game Interface */}
+            <div className="w-1/2 p-4 bg-white">
+              <h2 className="text-2xl font-bold text-blue-600 mb-4">Sign Language Game</h2>
+              <div className="text-center">
+                <p className="text-xl font-semibold mb-4">
+                  Show the sign for: <span className="text-4xl font-bold text-green-600">{targetLetter}</span>
+                </p>
+                <p className="text-gray-700 mb-4">
+                  Score: <span className="font-bold text-blue-600">{score}</span>
+                </p>
+                <p className="text-gray-700 mb-4">
+                  Time Left: <span className="font-bold text-red-600">{timeLeft}</span> seconds
+                </p>
+                {!isGameActive && (
+                  <p className="text-red-600 font-bold text-xl">Time's up! Game Over.</p>
+                )}
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
