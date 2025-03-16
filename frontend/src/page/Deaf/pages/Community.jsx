@@ -7,37 +7,166 @@ import Poll from "../components/Poll";
 import SignLanguageVideo from "../components/SignLanguageVideo";
 import VisualNotification from "../components/VisualNotification";
 import { Video, Users, MessageCircle, Bell, ThumbsUp, Camera, Mic, Smile, FileText, ArrowRight } from "lucide-react";
+import axios from "axios";
+import SendBird from "sendbird"; // Import SendBird SDK
 
 export default function Community() {
   const [notifications, setNotifications] = useState([]);
   const [activeTab, setActiveTab] = useState("forum"); // Tabs for navigation
   const [pollResults, setPollResults] = useState({});
   const [isSignLanguageOpen, setIsSignLanguageOpen] = useState(false);
+  const [forumPosts, setForumPosts] = useState([]); // State for forum posts
+  const [chatMessages, setChatMessages] = useState([]); // State for live chat messages
+  const [polls, setPolls] = useState([]); // State for polls
 
-  // Dummy data for notifications
+  // SendBird API Key
+  const SENDBIRD_APP_ID = "164d16b1ccba4327a67b7629";
+
+  // Typeform Token Secret
+  const TYPEFORM_TOKEN = "tfp_FPkHcTeUVTiuGZKMGoSEggwdwzVf6Vb2RtacHxkLLh23_3sv119gX6s7T71";
+
+  // Fetch forum posts from API (keep the existing implementation)
   useEffect(() => {
-    setNotifications([
-      { id: 1, message: "New message from John", type: "message", read: false },
-      { id: 2, message: "Your post got 10 likes", type: "like", read: false },
-      { id: 3, message: "New poll created: Best Sign Language App", type: "poll", read: false },
-    ]);
+    const fetchForumPosts = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/forum/posts"); // Replace with your API endpoint
+        setForumPosts(response.data);
+      } catch (error) {
+        console.error("Error fetching forum posts:", error);
+      }
+    };
+
+    fetchForumPosts();
   }, []);
 
-  // Handle poll submission
-  const handlePollSubmit = (pollId, selectedOption) => {
-    setPollResults((prev) => ({
-      ...prev,
-      [pollId]: selectedOption,
-    }));
+  // Fetch polls from Typeform API
+  useEffect(() => {
+    const fetchPolls = async () => {
+      try {
+        const response = await axios.get("https://api.typeform.com/forms", {
+          headers: {
+            Authorization: `Bearer ${TYPEFORM_TOKEN}`,
+          },
+        });
+
+        // Assuming the first form is the one you want to use
+        const formId = response.data.items[0].id;
+        const formResponse = await axios.get(`https://api.typeform.com/forms/${formId}`, {
+          headers: {
+            Authorization: `Bearer ${TYPEFORM_TOKEN}`,
+          },
+        });
+
+        // Extract poll questions and options
+        const pollData = formResponse.data.fields.map((field) => ({
+          id: field.id,
+          question: field.title,
+          options: field.properties.choices.map((choice) => choice.label),
+        }));
+
+        setPolls(pollData);
+      } catch (error) {
+        console.error("Error fetching polls from Typeform:", error);
+      }
+    };
+
+    fetchPolls();
+  }, []);
+
+  // Initialize SendBird for live chat
+  useEffect(() => {
+    const sb = new SendBird({ appId: SENDBIRD_APP_ID });
+
+    // Connect to SendBird
+    sb.connect("USER_ID", (user, error) => {
+      if (error) {
+        console.error("Error connecting to SendBird:", error);
+        return;
+      }
+
+      // Join a channel (replace with your channel URL)
+      const channelUrl = "YOUR_CHANNEL_URL";
+      sb.GroupChannel.getChannel(channelUrl, (groupChannel, error) => {
+        if (error) {
+          console.error("Error fetching channel:", error);
+          return;
+        }
+
+        // Listen for new messages
+        groupChannel.onMessageReceived = (message) => {
+          setChatMessages((prevMessages) => [...prevMessages, message]);
+        };
+      });
+    });
+
+    return () => {
+      sb.disconnect();
+    };
+  }, []);
+
+  // Handle poll submission to Typeform
+  const handlePollSubmit = async (pollId, selectedOption) => {
+    try {
+      const formId = "https://form.typeform.com/to/vxw1LbQv"; // Replace with your Typeform form ID
+      await axios.post(
+        `https://api.typeform.com/forms/${formId}/responses`,
+        {
+          response: {
+            answers: [
+              {
+                field: {
+                  id: pollId,
+                },
+                choice: {
+                  label: selectedOption,
+                },
+              },
+            ],
+          },
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${TYPEFORM_TOKEN}`,
+          },
+        }
+      );
+
+      // Update poll results locally
+      setPollResults((prev) => ({
+        ...prev,
+        [pollId]: selectedOption,
+      }));
+    } catch (error) {
+      console.error("Error submitting poll to Typeform:", error);
+    }
   };
 
-  // Mark notification as read
-  const markNotificationAsRead = (id) => {
-    setNotifications((prev) =>
-      prev.map((notification) =>
-        notification.id === id ? { ...notification, read: true } : notification
-      )
-    );
+  // Fetch notifications from API (keep the existing implementation)
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/notifications"); // Replace with your API endpoint
+        setNotifications(response.data);
+      } catch (error) {
+        console.error("Error fetching notifications:", error);
+      }
+    };
+
+    fetchNotifications();
+  }, []);
+
+  // Mark notification as read (keep the existing implementation)
+  const markNotificationAsRead = async (id) => {
+    try {
+      await axios.put(`http://localhost:5000/api/notifications/${id}/read`); // Replace with your API endpoint
+      setNotifications((prev) =>
+        prev.map((notification) =>
+          notification.id === id ? { ...notification, read: true } : notification
+        )
+      );
+    } catch (error) {
+      console.error("Error marking notification as read:", error);
+    }
   };
 
   return (
@@ -58,7 +187,7 @@ export default function Community() {
             {isSignLanguageOpen ? "Close Sign Language" : "Open Sign Language"}
           </button>
         </div>
-
+  
         {/* Tabs */}
         <div className="flex space-x-4 mb-8">
           <button
@@ -95,36 +224,27 @@ export default function Community() {
             Polls
           </button>
         </div>
-
+  
         {/* Content Based on Active Tab */}
         {activeTab === "forum" && (
           <div className="space-y-8">
-            <Forum />
+            <Forum posts={forumPosts} />
           </div>
         )}
-
+  
         {activeTab === "chat" && (
           <div className="space-y-8">
-            <LiveChat />
+            <LiveChat messages={chatMessages} />
           </div>
         )}
-
+  
         {activeTab === "polls" && (
           <div className="space-y-8">
-            <Poll
-              question="What is your favorite sign language app?"
-              options={["Signily", "HandTalk", "SignAll", "Other"]}
-              onSubmit={handlePollSubmit}
-            />
-            {pollResults["poll1"] && (
-              <div className="mt-4">
-                <h3 className="text-xl font-bold text-blue-600 mb-2">Poll Results</h3>
-                <p>You selected: {pollResults["poll1"]}</p>
-              </div>
-            )}
+            {/* Use the new <Poll /> component with Typeform embed */}
+            <Poll />
           </div>
         )}
-
+  
         {/* Sign Language Video Modal */}
         {isSignLanguageOpen && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -142,7 +262,7 @@ export default function Community() {
             </div>
           </div>
         )}
-
+  
         {/* Visual Notifications */}
         <div className="fixed bottom-4 right-4 space-y-2">
           {notifications.map((notification) => (
