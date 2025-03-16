@@ -6,7 +6,7 @@ import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
 import PremiumBanner from "../components/PremiumBanner";
 import ProgressTracker from "../components/ProgressTracker";
-import { PlayCircle, Image, Award, Star, BookOpen, Video as VideoIcon, Zap, Clock } from "lucide-react";
+import { PlayCircle, Image, Award, Star, BookOpen, Video as VideoIcon, Zap, Clock, Search } from "lucide-react";
 import axios from "axios";
 
 export default function VisualLearning() {
@@ -15,35 +15,44 @@ export default function VisualLearning() {
   const [showPremiumBanner, setShowPremiumBanner] = useState(true); // Control premium banner visibility
   const [videoLessons, setVideoLessons] = useState([]); // State for YouTube videos
   const [loading, setLoading] = useState(true); // Loading state for API call
+  const [searchQuery, setSearchQuery] = useState("sign language tutorial"); // Search query state
+  const [searchInput, setSearchInput] = useState(""); // User input for search
 
-  // YouTube API Key and Search Query
+  // YouTube API Key
   const API_KEY = "AIzaSyCXBvqi3k3WI35dvKKDLGv41ukBmttNHKU"; // Replace with your YouTube API key
-  const SEARCH_QUERY = "sign language tutorial"; // Search query for sign language videos
 
-  // Fetch YouTube videos on component mount
+  // Fetch YouTube videos based on search query
+  const fetchVideos = async (query) => {
+    try {
+      setLoading(true);
+      const response = await axios.get(
+        `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=10&q=${query}&key=${API_KEY}&type=video`
+      );
+      const videos = response.data.items.map((item) => ({
+        id: item.id.videoId,
+        title: item.snippet.title,
+        thumbnail: item.snippet.thumbnails.medium.url,
+        channel: item.snippet.channelTitle,
+        duration: "10:00", // Duration can be fetched using another API call
+      }));
+      setVideoLessons(videos);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching YouTube videos:", error);
+      setLoading(false);
+    }
+  };
+
+  // Fetch videos on component mount
   useEffect(() => {
-    const fetchVideos = async () => {
-      try {
-        const response = await axios.get(
-          `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=10&q=${SEARCH_QUERY}&key=${API_KEY}&type=video`
-        );
-        const videos = response.data.items.map((item) => ({
-          id: item.id.videoId,
-          title: item.snippet.title,
-          thumbnail: item.snippet.thumbnails.medium.url,
-          channel: item.snippet.channelTitle,
-          duration: "10:00", // Duration can be fetched using another API call
-        }));
-        setVideoLessons(videos);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching YouTube videos:", error);
-        setLoading(false);
-      }
-    };
+    fetchVideos(searchQuery);
+  }, [searchQuery]);
 
-    fetchVideos();
-  }, []);
+  // Handle search input submission
+  const handleSearch = (e) => {
+    e.preventDefault();
+    setSearchQuery(searchInput); // Update search query state
+  };
 
   // Dummy data for visual aids
   const visualAids = [
@@ -89,6 +98,22 @@ export default function VisualLearning() {
           <h1 className="text-4xl font-bold text-blue-600">Visual Learning Tools</h1>
           <ProgressTracker progress={progress} />
         </div>
+
+        {/* Search Bar */}
+        <form onSubmit={handleSearch} className="mb-8">
+          <div className="flex items-center bg-gray-200 rounded-lg p-2">
+            <input
+              type="text"
+              placeholder="Search for videos..."
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              className="flex-1 bg-transparent outline-none px-4 py-2"
+            />
+            <button type="submit" className="p-2 text-gray-600 hover:text-blue-600">
+              <Search size={20} />
+            </button>
+          </div>
+        </form>
 
         {/* Tabs */}
         <div className="flex space-x-4 mb-8">
