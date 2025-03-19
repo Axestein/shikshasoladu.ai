@@ -52,12 +52,6 @@ export default function Sidebar() {
           </Link>
         </li>
         <li>
-          <Link to="/dashboard-deaf" className="text-white hover:text-yellow-300 flex items-center gap-2 transition duration-300 px-6 py-2">
-            <BarChart2 size={18} />
-            {isSidebarOpen && <span>Dashboard</span>}
-          </Link>
-        </li>
-        <li>
           <Link to="/signlang" className="text-white hover:text-yellow-300 flex items-center gap-2 transition duration-300 px-6 py-2">
             <Clipboard size={18} />
             {isSidebarOpen && <span>Sign Language</span>}

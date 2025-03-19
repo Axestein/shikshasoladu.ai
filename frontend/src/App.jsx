@@ -15,6 +15,7 @@ import Canvas from "./page/Deaf/pages/Canvas";
 import Signgame from "./page/Deaf/components/Signgame";
 import Meet from "./page/Deaf/pages/Meet";
 import PlanYourDay from "./page/Deaf/pages/PlanYourDay";
+import SignAuth from "./page/Deaf/components/Auth";
 
 export default function App() {
   return (
@@ -26,7 +27,6 @@ export default function App() {
         <Route path="/home" element={<Home />} />
 
         <Route path="/allusers" element={<Home1 />} />
-        <Route path="/dashboard-deaf" element={<Dashboard />} />
         <Route path="/signlang" element={<SignLanguage />} />
         <Route path="/visual-learning" element={<VisualLearning />} />
         <Route path="/gamification-deaf" element={<Gamification />} />
@@ -37,6 +37,7 @@ export default function App() {
         <Route path="/signgame" element={<Signgame />} />
         <Route path="/deaf-meet" element={<Meet />} />
         <Route path="/deaf-planyourday" element={<PlanYourDay />} />
+        <Route path="/authdeaf" element={<SignAuth />} />
       </Routes>
     </Router>
   );
