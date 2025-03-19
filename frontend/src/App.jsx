@@ -16,6 +16,7 @@ import Signgame from "./page/Deaf/components/Signgame";
 import Meet from "./page/Deaf/pages/Meet";
 import PlanYourDay from "./page/Deaf/pages/PlanYourDay";
 import SignAuth from "./page/Deaf/components/Auth";
+import AuthBlind from "./page/Blind/components/AuthBlind";
 
 export default function App() {
   return (
@@ -38,6 +39,8 @@ export default function App() {
         <Route path="/deaf-meet" element={<Meet />} />
         <Route path="/deaf-planyourday" element={<PlanYourDay />} />
         <Route path="/authdeaf" element={<SignAuth />} />
+
+        <Route path="/authblind" element={<AuthBlind />} />
       </Routes>
     </Router>
   );

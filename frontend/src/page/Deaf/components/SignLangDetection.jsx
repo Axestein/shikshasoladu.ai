@@ -7,6 +7,7 @@ export default function SignLanguageDetection() {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const [detectedLetter, setDetectedLetter] = useState("");
+  const [isDetecting, setIsDetecting] = useState(false);
 
   useEffect(() => {
     const hands = new Hands({
@@ -15,7 +16,7 @@ export default function SignLanguageDetection() {
 
     hands.setOptions({
       maxNumHands: 1,
-      modelComplexity: 1,
+      modelComplexity: 1, 
       minDetectionConfidence: 0.5,
       minTrackingConfidence: 0.5,
     });
@@ -33,7 +34,10 @@ export default function SignLanguageDetection() {
           drawLandmarks(ctx, landmarks);
           const letter = detectSignLanguageLetter(landmarks);
           setDetectedLetter(letter);
+          setIsDetecting(true);
         }
+      } else {
+        setIsDetecting(false);
       }
     });
 
@@ -53,15 +57,15 @@ export default function SignLanguageDetection() {
 
   // Function to draw hand landmarks on the canvas
   const drawLandmarks = (ctx, landmarks) => {
-    ctx.fillStyle = "#FF0000";
+    ctx.fillStyle = "#3B82F6";
     for (const landmark of landmarks) {
       ctx.beginPath();
-      ctx.arc(landmark.x * canvasRef.current.width, landmark.y * canvasRef.current.height, 5, 0, 2 * Math.PI);
+      ctx.arc(landmark.x * canvasRef.current.width, landmark.y * canvasRef.current.height, 4, 0, 2 * Math.PI);
       ctx.fill();
     }
 
     // Draw connections between landmarks
-    ctx.strokeStyle = "#00FF00";
+    ctx.strokeStyle = "#10B981";
     ctx.lineWidth = 2;
     for (const [start, end] of HAND_CONNECTIONS) {
       ctx.beginPath();
@@ -329,39 +333,65 @@ export default function SignLanguageDetection() {
     // If no letter is detected
     return "";
   };
+
+  const getLetterStyle = () => {
+    return detectedLetter 
+      ? "text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent animate-pulse"
+      : "text-4xl font-bold text-gray-400";
+  };
+
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold text-blue-600 mb-4">
-        Sign Language Detection
+    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-8 rounded-2xl shadow-lg max-w-4xl mx-auto">
+      <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-6 text-center">
+        Sign Language Translator
       </h2>
-      <div className="flex items-center justify-between space-x-1">
-        <div className="relative w-full max-w-md">
-          <video
-            ref={videoRef}
-            className="w-full h-auto rounded-lg"
-            autoPlay
-            playsInline
-          ></video>
-          <canvas
-            ref={canvasRef}
-            className="absolute top-0 left-0 w-full h-full"
-            width={640}
-            height={480}
-          ></canvas>
+      
+      <div className="flex flex-col md:flex-row items-center gap-6">
+        <div className="w-full md:w-3/4 relative group">
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-purple-500 rounded-xl blur opacity-25 group-hover:opacity-40 transition duration-300"></div>
+          <div className="relative rounded-xl overflow-hidden shadow-xl">
+            <video
+              ref={videoRef}
+              className="w-full h-auto rounded-xl"
+              autoPlay
+              playsInline
+            ></video>
+            <canvas
+              ref={canvasRef}
+              className="absolute top-0 left-0 w-full h-full"
+              width={640}
+              height={480}
+            ></canvas>
+            
+            {/* Overlay effect when detecting */}
+            <div className={`absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 pointer-events-none transition-opacity duration-300 ${isDetecting ? 'opacity-100' : 'opacity-0'}`}></div>
+          </div>
         </div>
 
-        <div className="flex-none w-1/5">
-          <img
-            src={atozsignlang}
-            alt="Sign Language Image"
-            className="w-full h-auto rounded-lg shadow-md"
-          />
+        <div className="w-full md:w-1/4 flex flex-col items-center gap-6">
+          <div className="relative group w-full">
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-purple-500 rounded-xl blur opacity-25 group-hover:opacity-40 transition duration-300"></div>
+            <div className="relative">
+              <img
+                src={atozsignlang}
+                alt="ASL Alphabet Reference"
+                className="w-full h-auto rounded-xl shadow-xl object-cover transform transition duration-300 group-hover:scale-[1.02]"
+              />
+            </div>
+          </div>
+          
+          <div className="bg-white/90 backdrop-blur-sm rounded-xl p-4 shadow-lg w-full text-center transform transition hover:scale-[1.02] duration-300">
+            <p className="text-gray-600 mb-2 text-lg">Detected Letter:</p>
+            <div className={`${getLetterStyle()} min-h-12 flex items-center justify-center`}>
+              {detectedLetter || "—"}
+            </div>
+          </div>
         </div>
       </div>
       
-      <p className="text-gray-700 mt-4 text-center">
-        Detected Letter: <span className="font-bold text-blue-600">{detectedLetter}</span>
-      </p>
+      <div className="mt-6 text-center text-gray-500 text-sm">
+        <p>Show hand signs in front of your camera to translate them into letters</p>
+      </div>
     </div>
   );
 };
