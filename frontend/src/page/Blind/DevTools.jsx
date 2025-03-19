@@ -18,6 +18,7 @@ function Blind() {
   const [error, setError] = useState(null);
   const speechSynthesis = window.speechSynthesis;
   const utteranceRef = useRef(null);
+  const observerRef = useRef(null);
 
   const {
     transcript,
@@ -128,6 +129,30 @@ function Blind() {
 
     checkCommand();
   }, [transcript]);
+
+  useEffect(() => {
+    const mainContent = document.querySelector('main');
+    if (mainContent) {
+      observerRef.current = new MutationObserver(() => {
+        if (isSpeaking) {
+          speechSynthesis.cancel();
+          speakText(mainContent.textContent);
+        }
+      });
+
+      observerRef.current.observe(mainContent, {
+        childList: true,
+        subtree: true,
+        characterData: true
+      });
+    }
+
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
+  }, [isSpeaking]);
 
   if (!browserSupportsSpeechRecognition) {
     return <div>Browser doesn't support speech recognition.</div>;
@@ -314,7 +339,6 @@ function Blind() {
               <Document
                 file={pdfFile}
                 onLoadSuccess={({ numPages }) => setNumPages(numPages)}
-                onLoadError={(error) => setError('Failed to load PDF.')}
                 className="border rounded-lg p-4"
               >
                 <Page
