@@ -79,7 +79,7 @@ const MentorshipLandingPage = () => {
 
       // Check for the specific command
       if (transcript.includes("take me to the blind page")) {
-        navigate("/mainblind"); // Navigate to the blind page
+        navigate("/authblind"); // Navigate to the blind page
       }
     };
 
@@ -376,7 +376,7 @@ const MentorshipLandingPage = () => {
                     </li>
                   </ul>
                   <Link
-                    to="/mainblind"
+                    to="/authblind"
                     className="block w-full bg-purple-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-purple-700 transition duration-300 text-center group-hover:bg-purple-500"
                   >
                     <span className="flex items-center justify-center">

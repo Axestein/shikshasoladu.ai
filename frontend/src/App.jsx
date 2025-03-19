@@ -18,9 +18,10 @@ import PlanYourDay from "./page/Deaf/pages/PlanYourDay";
 import SignAuth from "./page/Deaf/components/Auth";
 import AuthBlind from "./page/Blind/components/AuthBlind";
 import SubtitleGenerator from "./page/Blind/pages/SubtitleGenerator";
-import DevTool from "./page/Blind/pages/DevTools";
+import DevTool from "./page/Blind/components/DevTools";
 import CodeViewer from "./page/Blind/pages/CodeViewer";
 import Aitutor from "./page/Blind/components/Aitutor";
+import BlindNavbar from "./page/Blind/components/Navbar";
 
 export default function App() {
   return (
@@ -49,6 +50,7 @@ export default function App() {
         <Route path="/blinddev" element={<DevTool />} />
         <Route path="/blindsubtitle" element={<SubtitleGenerator />} />
         <Route path="/aitutor" element={<Aitutor />} />
+        <Route path="/blindnavbar" element={<BlindNavbar />} />
       </Routes>
     </Router>
   );

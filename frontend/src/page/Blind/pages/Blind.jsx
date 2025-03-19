@@ -4,7 +4,7 @@ import 'regenerator-runtime/runtime';
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 import { Mic, MicOff, Book, Video, MessageSquare, Users, Brain, FileText, Volume2, VolumeX, ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Code2 } from 'lucide-react';
 import { Document, Page, pdfjs } from 'react-pdf';
-import DevTools from './DevTools';
+import DevTools from '../components/DevTools';
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 import logo from "../../../assets/logo.png";
 
@@ -23,15 +23,15 @@ function Blind() {
 
   const navigate = useNavigate();
 
-  const handleClick = () => {
-    navigate('/aitutor'); // Navigate to the Developer page
+  const handleClick = (path) => {
+    navigate(path); // Navigate to the specified path
   };
-  
+
   const {
     transcript,
     listening,
     resetTranscript,
-    browserSupportsSpeechRecognition
+    browserSupportsSpeechRecognition,
   } = useSpeechRecognition();
 
   const speakText = (text) => {
@@ -102,6 +102,7 @@ function Blind() {
     setScale(prev => Math.max(prev - 0.2, 0.6));
   };
 
+  // Voice commands
   useEffect(() => {
     const voiceCommands = {
       'go to learning': () => setActiveSection('learning'),
@@ -109,6 +110,7 @@ function Blind() {
       'go to community': () => setActiveSection('community'),
       'go to resources': () => setActiveSection('resources'),
       'go to reader': () => setActiveSection('reader'),
+      'go to ai tutor': () => navigate('/aitutor'), // Use navigate for routing
       'go home': () => setActiveSection('home'),
       'read page': () => {
         const mainContent = document.querySelector('main').textContent;
@@ -121,7 +123,7 @@ function Blind() {
       'next page': () => nextPage(),
       'previous page': () => previousPage(),
       'zoom in': () => zoomIn(),
-      'zoom out': () => zoomOut()
+      'zoom out': () => zoomOut(),
     };
 
     const checkCommand = () => {
@@ -135,7 +137,15 @@ function Blind() {
     };
 
     checkCommand();
-  }, [transcript]);
+  }, [transcript, navigate, resetTranscript]);
+
+  // Fallback for invalid activeSection
+  const validSections = ['home', 'learning', 'videos', 'community', 'resources', 'reader'];
+  useEffect(() => {
+    if (!validSections.includes(activeSection)) {
+      setActiveSection('home'); // Fallback to 'home' if activeSection is invalid
+    }
+  }, [activeSection]);
 
   if (!browserSupportsSpeechRecognition) {
     return <div>Browser doesn't support speech recognition.</div>;
@@ -385,18 +395,6 @@ function Blind() {
         </div>
       )
     },
-    developer: {
-      title: "Developer Tools",
-      content: (
-        <div className="space-y-6">
-          <div className="bg-white p-6 rounded-lg shadow-lg">
-            <h3 className="text-xl font-bold mb-4">Developer Console</h3>
-            <p className="mb-4">Access speech recognition debugging tools and implementation examples.</p>
-            <DevTools />
-          </div>
-        </div>
-      )
-    }
   };
 
   return (
@@ -407,7 +405,10 @@ function Blind() {
             <div className="flex space-x-8">
               <div className="flex-shrink-0 flex items-center">
                 <img src={logo} alt="ShikshaSoladu Logo" className="h-8 w-8" />
-                <span className="ml-2 text-xl font-bold">ShikshaSoladu.ai</span>
+                <span className="ml-2 text-xl font-bold mr-2">ShikshaSoladu.ai</span>
+                <span className="px-4 py-1 text-sm font-semibold bg-black text-white ml-0 rounded-2xl">
+              For Blind
+              </span>
               </div>
               <div className="hidden md:flex items-center space-x-4">
                 <button onClick={() => setActiveSection('learning')} className="flex items-center px-3 py-2 rounded-md hover:bg-gray-100">
@@ -430,7 +431,7 @@ function Blind() {
                   <FileText className="h-5 w-5 mr-1" />
                   PDF Reader
                 </button>
-                <button onClick={handleClick} className="flex items-center px-3 py-2 rounded-md hover:bg-gray-100">
+                <button onClick={() => handleClick('/aitutor')} className="flex items-center px-3 py-2 rounded-md hover:bg-gray-100">
                   <Code2 className="h-5 w-5 mr-1" />AI Tutor
                 </button>
               </div>
@@ -459,17 +460,17 @@ function Blind() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">{sections[activeSection].title}</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">{sections[activeSection]?.title || 'Welcome'}</h1>
           {listening && (
             <div className="bg-blue-50 p-3 rounded-lg mb-4">
               <p className="text-sm text-blue-700">🎤 Listening for voice commands... "{transcript}"</p>
             </div>
           )}
         </div>
-        {sections[activeSection].content}
+        {sections[activeSection]?.content || <p>Section not found.</p>}
       </main>
     </div>
   );
 }
 
-export default Blind;
+export default Blind;   

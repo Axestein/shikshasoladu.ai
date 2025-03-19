@@ -10,12 +10,17 @@ export default function Navbar() {
         {/* Left Side: You can add your left-side content here, like logo or links */}
         <div className="flex items-center">
           {/* Add content on the left if needed */}
+          
         </div>
 
         {/* Right Side - Search Box and Profile Icon */}
         <div className="flex items-center gap-6 ml-auto">
+        <span className="px-4 py-1 text-sm font-semibold bg-yellow-400 text-white mr-2 ml-0 rounded-2xl">
+        For Deaf
+        </span>
           {/* Search Box */}
           <div className="flex items-center bg-white p-2 rounded-lg shadow-md max-w-xs">
+            
             <Search size={18} className="text-gray-500" />
             <input
               type="text"
