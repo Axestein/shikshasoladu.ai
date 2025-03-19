@@ -394,4 +394,4 @@ export default function SignLanguageDetection() {
       </div>
     </div>
   );
-};
+}; 

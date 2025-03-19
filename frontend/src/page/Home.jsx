@@ -7,7 +7,7 @@ import wheel from '../page/Deaf/assets/wheel.jpg';
 import alarmy from '../page/Deaf/assets/alarmy.jpg';
 import blindboy from "../page/Deaf/assets/blindboy.jpg";
 import { Ear, Eye, Users, Book, Video, Award, Globe, ArrowRight, HandMetal, Braces } from "lucide-react";
-
+import logo from "../assets/logo.png";
 
 const MentorshipLandingPage = () => {
   const navigate = useNavigate();
@@ -20,6 +20,7 @@ const MentorshipLandingPage = () => {
       className="w-full bg-indigo-700 p-2 shadow-lg fixed top-0 ml-0 z-10"
     >
       <div className="container mx-auto flex justify-between items-center mr-60">
+        
         <Link to="/" className="text-white text-2xl font-bold flex items-center ml-20 gap-2">
           <span className="text-yellow-300">Shiksha</span>Soladu.ai
         </Link>
@@ -78,7 +79,7 @@ const MentorshipLandingPage = () => {
 
       // Check for the specific command
       if (transcript.includes("take me to the blind page")) {
-        navigate("/blind"); // Navigate to the blind page
+        navigate("/mainblind"); // Navigate to the blind page
       }
     };
 
@@ -99,7 +100,7 @@ const MentorshipLandingPage = () => {
 
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-yellow-300 p-10">
+    <div className="flex justify-center items-center min-h-screen bg-yellow-300 mt-4 p-10">
       
       <CustomNavbar />
       {/* Style to hide scrollbar */}
@@ -375,7 +376,7 @@ const MentorshipLandingPage = () => {
                     </li>
                   </ul>
                   <Link
-                    to="/blind"
+                    to="/mainblind"
                     className="block w-full bg-purple-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-purple-700 transition duration-300 text-center group-hover:bg-purple-500"
                   >
                     <span className="flex items-center justify-center">

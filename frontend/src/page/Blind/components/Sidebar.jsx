@@ -16,7 +16,6 @@ import {
   Calendar,
   Users as UsersIcon, // Use a different alias for Users to avoid conflict
 } from "lucide-react"; // Added ChevronDown and ChevronUp icons for dropdown toggle
-import logo from "../../../assets/logo.png";
 
 export default function Sidebar() {
   const [isGamificationOpen, setIsGamificationOpen] = useState(false); // State to track the dropdown toggle
@@ -33,9 +32,8 @@ export default function Sidebar() {
   return (
     <div className={`bg-indigo-700 h-full fixed top-0 left-0 z-50 transition-all ${isSidebarOpen ? 'w-64' : 'w-20'}`}>
       <div className="p-6 flex justify-between">
-        <img src={logo} alt="ShikshaSoladu Logo" className="h-8 w-8" />
         <Link to="/" className={`text-white text-2xl font-bold flex items-center gap-2 ${isSidebarOpen ? '' : 'justify-center'}`}>
-          <span className="text-yellow-300">ShikshaSoladu.ai</span>
+          <span className="text-yellow-300">Shiksha</span>Soladu.ai
         </Link>
         <button onClick={toggleSidebar} className="text-white">
           {isSidebarOpen ? (
@@ -48,21 +46,21 @@ export default function Sidebar() {
 
       <ul className="mt-0 space-y-4">
         <li>
-          <Link to="/deaf" className="text-white hover:text-yellow-300 flex items-center gap-2 transition duration-300 px-6 py-2">
+          <Link to="/mainblind" className="text-white hover:text-yellow-300 flex items-center gap-2 transition duration-300 px-6 py-2">
             <Home size={18} />
-            {isSidebarOpen && <span>Home</span>}
+            {isSidebarOpen && <span>Learning</span>}
           </Link>
         </li>
         <li>
           <Link to="/signlang" className="text-white hover:text-yellow-300 flex items-center gap-2 transition duration-300 px-6 py-2">
             <Clipboard size={18} />
-            {isSidebarOpen && <span>Sign Language</span>}
+            {isSidebarOpen && <span>Videos</span>}
           </Link>
         </li>
         <li>
           <Link to="/visual-learning" className="text-white hover:text-yellow-300 flex items-center gap-2 transition duration-300 px-6 py-2">
             <Eye size={18} />
-            {isSidebarOpen && <span>Visual Learning</span>}
+            {isSidebarOpen && <span>Community</span>}
           </Link>
         </li>
 
@@ -73,68 +71,28 @@ export default function Sidebar() {
             className="text-white hover:text-yellow-300 flex items-center gap-2 transition duration-300 px-6 py-2 w-full text-left"
           >
             <Award size={18} />
-            {isSidebarOpen && <span>Gamification</span>}
+            {isSidebarOpen && <span>Resources</span>}
             {isGamificationOpen ? <ChevronUp size={18} /> : <ChevronDown size={18} />} {/* Toggle Icon */}
           </button>
 
-          {/* Dropdown Links */}
-          {isGamificationOpen && (
-            <ul className="ml-6 mt-2 space-y-2">
-              <li>
-                <Link
-                  to="/canvas"
-                  className="text-white hover:text-yellow-300 flex items-center gap-2 transition duration-300 px-6 py-2"
-                >
-                  {isSidebarOpen && <span>Canvas</span>}
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/signgame"
-                  className="text-white hover:text-yellow-300 flex items-center gap-2 transition duration-300 px-6 py-2"
-                >
-                  {isSidebarOpen && <span>Sign Game</span>}
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/gamification-deaf"
-                  className="text-white hover:text-yellow-300 flex items-center gap-2 transition duration-300 px-6 py-2"
-                >
-                  {isSidebarOpen && <span>More Games</span>}
-                </Link>
-              </li>
-            </ul>
-          )}
+          
         </li>
 
         <li>
           <Link to="/community-deaf" className="text-white hover:text-yellow-300 flex items-center gap-2 transition duration-300 px-6 py-2">
             <UsersIcon size={18} />
-            {isSidebarOpen && <span>Community</span>}
+            {isSidebarOpen && <span>PDF Reader</span>}
           </Link>
         </li>
 
         {/* Plan Your Day and Meet with Peers */}
         <li>
-          <Link to="/deaf-meet" className="text-white hover:text-yellow-300 flex items-center gap-2 transition duration-300 px-6 py-2">
+          <Link to="/blinddev" className="text-white hover:text-yellow-300 flex items-center gap-2 transition duration-300 px-6 py-2">
             <UsersIcon size={18} />
-            {isSidebarOpen && <span>Meet with peers</span>}
+            {isSidebarOpen && <span>Developer</span>}
           </Link>
         </li>
-        <li>
-          <Link to="/deaf-planyourday" className="text-white hover:text-yellow-300 flex items-center gap-2 transition duration-300 px-6 py-2">
-            <Calendar size={18} /> {/* Icon for Plan Your Day */}
-            {isSidebarOpen && <span>Plan Your Day</span>}
-          </Link>
-        </li>
-
-        <li>
-          <Link to="/dprofile" className="text-white hover:text-yellow-300 flex items-center gap-2 transition duration-300 px-6 py-2">
-            <UserCircle size={18} />
-            {isSidebarOpen && <span>Profile</span>}
-          </Link>
-        </li>
+        
       </ul>
     </div>
   );

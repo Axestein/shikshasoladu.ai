@@ -6,9 +6,18 @@ import Navbar from "../components/Navbar";
 const Meet = () => {
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
+  const localStreamRef = useRef(null);
   const [peerId, setPeerId] = useState("");
   const [remotePeerId, setRemotePeerId] = useState("");
   const [peer, setPeer] = useState(null);
+  const [isCalling, setIsCalling] = useState(false);
+  const [connected, setConnected] = useState(false);
+  const [showCopyNotification, setShowCopyNotification] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const [isVideoOff, setIsVideoOff] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [callDuration, setCallDuration] = useState(0);
+  const [callTimer, setCallTimer] = useState(null);
 
   useEffect(() => {
     const peer = new Peer(); // Create a new Peer instance
@@ -23,420 +32,279 @@ const Meet = () => {
       navigator.mediaDevices
         .getUserMedia({ video: true, audio: true })
         .then((stream) => {
+          localStreamRef.current = stream;
           localVideoRef.current.srcObject = stream;
           call.answer(stream);
           call.on("stream", (remoteStream) => {
             remoteVideoRef.current.srcObject = remoteStream;
+            setConnected(true);
+            startCallTimer();
           });
         });
     });
 
     return () => {
+      if (callTimer) clearInterval(callTimer);
       peer.destroy(); // Clean up on unmount
     };
   }, []);
 
+  const startCallTimer = () => {
+    const timer = setInterval(() => {
+      setCallDuration(prev => prev + 1);
+    }, 1000);
+    setCallTimer(timer);
+  };
+
+  const formatCallDuration = (seconds) => {
+    const hrs = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    return `${hrs > 0 ? `${hrs}:` : ''}${mins < 10 && hrs > 0 ? `0${mins}` : mins}:${secs < 10 ? `0${secs}` : secs}`;
+  };
+
   const callPeer = () => {
     if (!remotePeerId) return;
 
+    setIsCalling(true);
     // Call the remote peer
     navigator.mediaDevices
       .getUserMedia({ video: true, audio: true })
       .then((stream) => {
+        localStreamRef.current = stream;
         localVideoRef.current.srcObject = stream;
         const call = peer.call(remotePeerId, stream);
         call.on("stream", (remoteStream) => {
           remoteVideoRef.current.srcObject = remoteStream;
+          setIsCalling(false);
+          setConnected(true);
+          startCallTimer();
         });
       });
   };
 
-  return (
-    <div className="flex flex-col ml-40 items-center justify-center h-screen bg-gray-100">
-      <Sidebar />
-      <Navbar />
-      <h1 className="text-3xl font-bold text-blue-600 mb-8">Meet with Peers</h1>
-
-      {/* Video Streams */}
-      <div className="flex space-x-4 mb-8">
-        <video ref={localVideoRef} autoPlay muted className="w-96 h-64 bg-black rounded-xl"></video>
-        <video ref={remoteVideoRef} autoPlay className="w-96 h-64 bg-black rounded-xl"></video>
-      </div>
-
-      {/* Peer ID Input */}
-      <div className="flex space-x-4 mb-8">
-        <input
-          type="text"
-          placeholder="Enter Remote Peer ID"
-          value={remotePeerId}
-          onChange={(e) => setRemotePeerId(e.target.value)}
-          className="p-2 border border-gray-300 rounded-lg"
-        />
-        <button
-          onClick={callPeer}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-300"
-        >
-          Call Peer
-        </button>
-      </div>
-
-      {/* Local Peer ID */}
-      <p className="text-gray-700">Your Peer ID: {peerId}</p>
-    </div>
-  );
-};
-
-export default Meet;
-
-{/* insane UI version 
-import React, { useEffect, useRef, useState } from "react";
-import Peer from "peerjs";
-import Sidebar from "../components/Sidebar";
-import Navbar from "../components/Navbar";
-import { Mic, MicOff, Video, VideoOff, MessageSquare, Users, ClosedCaptions, Settings, Share2, X } from "lucide-react";
-
-const Meet = () => {
-  const localVideoRef = useRef(null);
-  const remoteVideoRef = useRef(null);
-  const [peerId, setPeerId] = useState("");
-  const [remotePeerId, setRemotePeerId] = useState("");
-  const [peer, setPeer] = useState(null);
-  const [isConnected, setIsConnected] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
-  const [isVideoOff, setIsVideoOff] = useState(false);
-  const [captions, setCaptions] = useState(false);
-  const [chatOpen, setChatOpen] = useState(false);
-  const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState([]);
-  const [stream, setStream] = useState(null);
-  const [showInviteModal, setShowInviteModal] = useState(false);
-
-  // Initialize PeerJS
-  useEffect(() => {
-    const newPeer = new Peer({
-      config: {
-        iceServers: [
-          { urls: "stun:stun.l.google.com:19302" },
-          { urls: "stun:global.stun.twilio.com:3478" },
-        ],
-      },
+  const copyPeerId = () => {
+    navigator.clipboard.writeText(peerId).then(() => {
+      setShowCopyNotification(true);
+      setTimeout(() => {
+        setShowCopyNotification(false);
+      }, 2000);
     });
-
-    setPeer(newPeer);
-
-    // Set local peer ID
-    newPeer.on("open", (id) => {
-      setPeerId(id);
-    });
-
-    // Handle incoming call
-    newPeer.on("call", (call) => {
-      navigator.mediaDevices
-        .getUserMedia({ video: true, audio: true })
-        .then((mediaStream) => {
-          setStream(mediaStream);
-          localVideoRef.current.srcObject = mediaStream;
-          call.answer(mediaStream);
-          call.on("stream", (remoteStream) => {
-            remoteVideoRef.current.srcObject = remoteStream;
-            setIsConnected(true);
-          });
-        })
-        .catch((err) => {
-          console.error("Failed to get media stream:", err);
-        });
-    });
-
-    // Cleanup on unmount
-    return () => {
-      if (stream) {
-        stream.getTracks().forEach((track) => track.stop());
-      }
-      newPeer.destroy();
-    };
-  }, []);
-
-  // Call a remote peer
-  const callPeer = () => {
-    if (!remotePeerId) return;
-
-    navigator.mediaDevices
-      .getUserMedia({ video: true, audio: true })
-      .then((mediaStream) => {
-        setStream(mediaStream);
-        localVideoRef.current.srcObject = mediaStream;
-        const call = peer.call(remotePeerId, mediaStream);
-        call.on("stream", (remoteStream) => {
-          remoteVideoRef.current.srcObject = remoteStream;
-          setIsConnected(true);
-        });
-      })
-      .catch((err) => {
-        console.error("Failed to get media stream:", err);
-      });
   };
 
-  // Toggle mute/unmute
   const toggleMute = () => {
-    if (stream) {
-      stream.getAudioTracks().forEach((track) => {
+    if (localStreamRef.current) {
+      const audioTracks = localStreamRef.current.getAudioTracks();
+      audioTracks.forEach(track => {
         track.enabled = !track.enabled;
       });
       setIsMuted(!isMuted);
     }
   };
 
-  // Toggle video on/off
   const toggleVideo = () => {
-    if (stream) {
-      stream.getVideoTracks().forEach((track) => {
+    if (localStreamRef.current) {
+      const videoTracks = localStreamRef.current.getVideoTracks();
+      videoTracks.forEach(track => {
         track.enabled = !track.enabled;
       });
       setIsVideoOff(!isVideoOff);
     }
   };
 
-  // Toggle captions
-  const toggleCaptions = () => {
-    setCaptions(!captions);
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      remoteVideoRef.current.requestFullscreen().catch(err => {
+        console.error(`Error attempting to enable fullscreen: ${err.message}`);
+      });
+      setIsFullscreen(true);
+    } else {
+      document.exitFullscreen();
+      setIsFullscreen(false);
+    }
   };
 
-  // Toggle chat
-  const toggleChat = () => {
-    setChatOpen(!chatOpen);
-  };
-
-  // Send a chat message
-  const sendMessage = (e) => {
-    e.preventDefault();
-    if (!message.trim()) return;
-
-    const newMessage = {
-      text: message,
-      sender: "You",
-      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-    };
-
-    setMessages([...messages, newMessage]);
-    setMessage("");
-  };
-
-  // Copy meeting link to clipboard
-  const copyMeetingLink = () => {
-    navigator.clipboard.writeText(peerId);
-    alert("Meeting ID copied to clipboard");
-    setShowInviteModal(false);
+  const endCall = () => {
+    if (localStreamRef.current) {
+      localStreamRef.current.getTracks().forEach(track => track.stop());
+    }
+    if (callTimer) clearInterval(callTimer);
+    setCallDuration(0);
+    setConnected(false);
   };
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex flex-col ml-40 items-center justify-center h-screen bg-white">
       <Sidebar />
+      <Navbar />
+      <div className="relative w-full max-w-6xl flex flex-col items-center z-10">
+        <h1 className="text-3xl font-light mb-8 text-gray-800">
+          Meet
+        </h1>
 
-      <div className="flex flex-col flex-1 overflow-hidden">
-        <Navbar />
-
-        <main className="flex flex-col flex-1 overflow-hidden p-4">
-          <div className="bg-white rounded-2xl shadow-lg p-6 flex-1 flex flex-col overflow-hidden">
-            <div className="flex justify-between items-center mb-6">
-              <h1 className="text-2xl font-bold text-blue-700">Visual Learning Session</h1>
-
-              {isConnected && (
-                <div className="flex items-center space-x-2">
-                  <span className="h-3 w-3 bg-green-500 rounded-full animate-pulse"></span>
-                  <span className="text-green-600 font-medium">Connected</span>
+        {/* Video Streams */}
+        <div className="flex flex-wrap justify-center gap-6 mb-6 w-full">
+          {/* Local Video */}
+          <div className="relative">
+            <div className="bg-gray-50 rounded-lg overflow-hidden shadow-sm">
+              <video 
+                ref={localVideoRef} 
+                autoPlay 
+                muted 
+                className={`w-80 h-56 object-cover ${isVideoOff ? 'invisible' : ''}`}
+              />
+              {isVideoOff && (
+                <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+                  <div className="w-20 h-20 rounded-full bg-gray-300 flex items-center justify-center">
+                    <span className="text-xl text-gray-600">You</span>
+                  </div>
                 </div>
               )}
-            </div>
-
-            <div className="flex flex-1 overflow-hidden gap-4">
-              <div className="flex-1 flex flex-col overflow-hidden">
-                <div className="relative flex-1 bg-gray-900 rounded-xl overflow-hidden mb-4">
-                  {isConnected ? (
-                    <video ref={remoteVideoRef} autoPlay className="w-full h-full object-cover"></video>
+              <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-2">
+                <button 
+                  onClick={toggleMute} 
+                  className={`p-2 rounded-full ${isMuted ? 'bg-red-500' : 'bg-white'} shadow-md`}
+                >
+                  {isMuted ? (
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" clipRule="evenodd" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+                    </svg>
                   ) : (
-                    <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
-                      <Users size={64} className="mb-4 text-gray-400" />
-                      <p className="text-xl font-medium">Waiting for connection...</p>
-                      <p className="text-gray-400 mt-2">Share your meeting ID to invite someone</p>
-                    </div>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                    </svg>
                   )}
-
-                  {captions && (
-                    <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 p-3 text-white text-center">
-                      <p>Live captions will appear here when speech is detected</p>
-                    </div>
+                </button>
+                <button 
+                  onClick={toggleVideo} 
+                  className={`p-2 rounded-full ${isVideoOff ? 'bg-red-500' : 'bg-white'} shadow-md`}
+                >
+                  {isVideoOff ? (
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+                    </svg>
+                  ) : (
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
                   )}
-                </div>
-
-                <div className="h-36 relative bg-gray-800 rounded-xl overflow-hidden">
-                  <video ref={localVideoRef} autoPlay muted className="w-full h-full object-cover"></video>
-                  <div className="absolute bottom-2 left-2 bg-black bg-opacity-50 px-2 py-1 rounded-lg text-white text-sm">
-                    You
-                  </div>
-                </div>
+                </button>
               </div>
-
-              {chatOpen && (
-                <div className="w-80 bg-white rounded-xl border border-gray-200 flex flex-col">
-                  <div className="p-3 border-b border-gray-200 flex justify-between items-center">
-                    <h3 className="font-medium">Chat</h3>
-                    <button onClick={toggleChat} className="text-gray-500 hover:text-gray-700">
-                      <X size={20} />
-                    </button>
-                  </div>
-
-                  <div className="flex-1 overflow-y-auto p-3 space-y-3">
-                    {messages.length === 0 ? (
-                      <p className="text-gray-400 text-center">No messages yet</p>
-                    ) : (
-                      messages.map((msg, index) => (
-                        <div key={index} className={`flex flex-col ${msg.sender === "You" ? "items-end" : "items-start"}`}>
-                          <div className={`px-3 py-2 rounded-lg max-w-xs ${msg.sender === "You" ? "bg-blue-100" : "bg-gray-100"}`}>
-                            <p>{msg.text}</p>
-                          </div>
-                          <span className="text-xs text-gray-500 mt-1">{msg.sender} • {msg.time}</span>
-                        </div>
-                      ))
-                    )}
-                  </div>
-
-                  <form onSubmit={sendMessage} className="p-3 border-t border-gray-200">
-                    <div className="flex space-x-2">
-                      <input
-                        type="text"
-                        value={message}
-                        onChange={(e) => setMessage(e.target.value)}
-                        placeholder="Type a message..."
-                        className="flex-1 rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                      <button type="submit" className="bg-blue-600 text-white rounded-lg px-3 py-2 hover:bg-blue-700">
-                        Send
-                      </button>
-                    </div>
-                  </form>
-                </div>
-              )}
-            </div>
-
-            {!isConnected && (
-              <div className="bg-blue-50 rounded-xl p-4 mt-4 mb-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div>
-                    <h3 className="text-lg font-medium text-blue-800">Start a meeting</h3>
-                    <p className="text-blue-600">Enter a Peer ID to connect with someone</p>
-                  </div>
-
-                  <div className="flex flex-col sm:flex-row gap-2">
-                    <input
-                      type="text"
-                      placeholder="Enter Remote Peer ID"
-                      value={remotePeerId}
-                      onChange={(e) => setRemotePeerId(e.target.value)}
-                      className="p-2 border border-blue-300 rounded-lg"
-                    />
-                    <button
-                      onClick={callPeer}
-                      className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-300"
-                    >
-                      Connect
-                    </button>
-                  </div>
-                </div>
-
-                <div className="flex items-center mt-4 pt-4 border-t border-blue-200">
-                  <div className="text-blue-700 mr-3">Your Meeting ID:</div>
-                  <div className="bg-white px-3 py-1 rounded-lg border border-blue-300 font-mono">{peerId}</div>
-                  <button
-                    onClick={() => setShowInviteModal(true)}
-                    className="ml-auto text-blue-700 hover:text-blue-900 flex items-center"
-                  >
-                    <Share2 size={16} className="mr-1" />
-                    Share
-                  </button>
-                </div>
+              <div className="absolute top-3 left-3 bg-black bg-opacity-40 px-2 py-1 rounded-md text-xs text-white">
+                You
               </div>
-            )}
-
-            <div className="flex justify-center space-x-3 p-4 bg-gray-100 rounded-xl">
-              <button
-                onClick={toggleMute}
-                className={`p-3 rounded-full ${isMuted ? "bg-red-100 text-red-600" : "bg-gray-200 text-gray-700"} hover:bg-opacity-80`}
-                title={isMuted ? "Unmute" : "Mute"}
-              >
-                {isMuted ? <MicOff size={24} /> : <Mic size={24} />}
-              </button>
-
-              <button
-                onClick={toggleVideo}
-                className={`p-3 rounded-full ${isVideoOff ? "bg-red-100 text-red-600" : "bg-gray-200 text-gray-700"} hover:bg-opacity-80`}
-                title={isVideoOff ? "Turn video on" : "Turn video off"}
-              >
-                {isVideoOff ? <VideoOff size={24} /> : <Video size={24} />}
-              </button>
-
-              <button
-                onClick={toggleCaptions}
-                className={`p-3 rounded-full ${captions ? "bg-blue-100 text-blue-600" : "bg-gray-200 text-gray-700"} hover:bg-opacity-80`}
-                title={captions ? "Turn off captions" : "Turn on captions"}
-              >
-                <ClosedCaptions size={24} />
-              </button>
-
-              <button
-                onClick={toggleChat}
-                className={`p-3 rounded-full ${chatOpen ? "bg-blue-100 text-blue-600" : "bg-gray-200 text-gray-700"} hover:bg-opacity-80`}
-                title={chatOpen ? "Close chat" : "Open chat"}
-              >
-                <MessageSquare size={24} />
-              </button>
-
-              <button
-                className="p-3 rounded-full bg-gray-200 text-gray-700 hover:bg-opacity-80"
-                title="Settings"
-              >
-                <Settings size={24} />
-              </button>
             </div>
           </div>
-        </main>
-      </div>
-
-      {showInviteModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl p-6 max-w-md w-full">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-bold">Share meeting invitation</h3>
-              <button onClick={() => setShowInviteModal(false)} className="text-gray-500 hover:text-gray-700">
-                <X size={20} />
-              </button>
-            </div>
-
-            <p className="mb-4">Share this meeting ID with the person you want to meet with:</p>
-
-            <div className="flex items-center bg-gray-100 p-3 rounded-lg mb-4">
-              <span className="font-mono flex-1">{peerId}</span>
-              <button
-                onClick={copyMeetingLink}
-                className="bg-blue-600 text-white px-3 py-1 rounded-lg hover:bg-blue-700 text-sm"
-              >
-                Copy
-              </button>
-            </div>
-
-            <div className="mt-4 flex justify-end">
-              <button
-                onClick={() => setShowInviteModal(false)}
-                className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200"
-              >
-                Close
-              </button>
+          
+          {/* Remote Video */}
+          <div className="relative">
+            <div className="bg-gray-50 rounded-lg overflow-hidden shadow-sm">
+              <video ref={remoteVideoRef} autoPlay className="w-80 h-56 object-cover" />
+              {!connected && (
+                <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+                  <div className="text-gray-500">
+                    {isCalling ? (
+                      <div className="flex flex-col items-center">
+                        <div className="w-10 h-10 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mb-3"></div>
+                        <p className="text-sm">Connecting...</p>
+                      </div>
+                    ) : (
+                      <p>Waiting for connection</p>
+                    )}
+                  </div>
+                </div>
+              )}
+              <div className="absolute top-3 left-3 bg-black bg-opacity-40 px-2 py-1 rounded-md text-xs text-white">
+                Peer
+              </div>
+              {connected && (
+                <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-2">
+                  <button 
+                    onClick={toggleFullscreen} 
+                    className="p-2 rounded-full bg-white shadow-md"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 4h-4m4 0l-5-5" />
+                    </svg>
+                  </button>
+                  <button 
+                    onClick={endCall} 
+                    className="p-2 rounded-full bg-red-500 shadow-md"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 8l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M5 3a2 2 0 00-2 2v1c0 8.284 6.716 15 15 15h1a2 2 0 002-2v-3.28a1 1 0 00-.684-.948l-4.493-1.498a1 1 0 00-1.21.502l-1.13 2.257a11.042 11.042 0 01-5.516-5.517l2.257-1.128a1 1 0 00.502-1.21L9.228 3.683A1 1 0 008.279 3H5z" />
+                    </svg>
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
-      )}
+
+        {/* Call duration */}
+        {connected && (
+          <div className="text-sm text-gray-500 mb-6">
+            Call duration: {formatCallDuration(callDuration)}
+          </div>
+        )}
+
+        {/* Peer ID Input */}
+        <div className="flex flex-col sm:flex-row gap-3 mb-6 w-full max-w-lg">
+          <input
+            type="text"
+            placeholder="Enter Remote Peer ID"
+            value={remotePeerId}
+            onChange={(e) => setRemotePeerId(e.target.value)}
+            className="p-3 flex-grow border border-gray-200 rounded-lg text-gray-800 focus:outline-none focus:ring-1 focus:ring-blue-400"
+          />
+          <button
+            onClick={callPeer}
+            disabled={isCalling || !remotePeerId}
+            className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-200 disabled:bg-gray-300 disabled:cursor-not-allowed"
+          >
+            {isCalling ? (
+              <span className="flex items-center justify-center">
+                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Connecting
+              </span>
+            ) : (
+              "Call"
+            )}
+          </button>
+        </div>
+
+        {/* Local Peer ID with Copy Button */}
+        <div className="bg-gray-50 p-3 rounded-lg flex items-center gap-3 border border-gray-100">
+          <span className="text-gray-500 text-sm">Your ID:</span>
+          <code className="font-mono text-gray-800 bg-gray-100 px-2 py-1 rounded text-sm">{peerId}</code>
+          <button
+            onClick={copyPeerId}
+            className="p-2 text-gray-500 hover:text-blue-500 transition duration-200"
+            title="Copy Peer ID"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      {/* Copy Notification Popup */}
+      <div className={`fixed bottom-8 right-8 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg transform transition-all duration-300 flex items-center ${
+        showCopyNotification ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8 pointer-events-none"
+      }`}>
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+        </svg>
+        Copied to clipboard
+      </div>
     </div>
   );
 };
 
 export default Meet;
- */}

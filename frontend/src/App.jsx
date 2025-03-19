@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import Home1 from "../src/page/Alluser/Home1";
 import Home from "./page/Home";
 import Deaf from "./page/Deaf/Deaf";
-import Blind from "./page/Blind/Blind";
+import Blind from "./page/Blind/pages/Blind";
 import Dashboard from "./page/Deaf/pages/Dashboard";
 import SignLanguage from "./page/Deaf/pages/SignLanguage";
 import VisualLearning from "./page/Deaf/pages/VisualLearning";
@@ -17,6 +17,10 @@ import Meet from "./page/Deaf/pages/Meet";
 import PlanYourDay from "./page/Deaf/pages/PlanYourDay";
 import SignAuth from "./page/Deaf/components/Auth";
 import AuthBlind from "./page/Blind/components/AuthBlind";
+import SubtitleGenerator from "./page/Blind/pages/SubtitleGenerator";
+import DevTool from "./page/Blind/pages/DevTools";
+import CodeViewer from "./page/Blind/pages/CodeViewer";
+import Aitutor from "./page/Blind/components/Aitutor";
 
 export default function App() {
   return (
@@ -24,7 +28,6 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/deaf" element={<Deaf />} />
-        <Route path="/blind" element={<Blind />} />
         <Route path="/home" element={<Home />} />
 
         <Route path="/allusers" element={<Home1 />} />
@@ -41,6 +44,11 @@ export default function App() {
         <Route path="/authdeaf" element={<SignAuth />} />
 
         <Route path="/authblind" element={<AuthBlind />} />
+        <Route path="/mainblind" element={<Blind />} />
+        <Route path="/blindcode" element={<CodeViewer />} />
+        <Route path="/blinddev" element={<DevTool />} />
+        <Route path="/blindsubtitle" element={<SubtitleGenerator />} />
+        <Route path="/aitutor" element={<Aitutor />} />
       </Routes>
     </Router>
   );

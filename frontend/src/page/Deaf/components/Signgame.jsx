@@ -459,4 +459,4 @@ export default function SignLanguageGame() {
       </div>
     </div>
   );
-}
+} 

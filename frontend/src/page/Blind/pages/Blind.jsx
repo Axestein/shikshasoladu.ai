@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import 'regenerator-runtime/runtime';
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 import { Mic, MicOff, Book, Video, MessageSquare, Users, Brain, FileText, Volume2, VolumeX, ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Code2 } from 'lucide-react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import DevTools from './DevTools';
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+import logo from "../../../assets/logo.png";
 
 function Blind() {
   const [activeSection, setActiveSection] = useState('home');
@@ -19,6 +21,12 @@ function Blind() {
   const speechSynthesis = window.speechSynthesis;
   const utteranceRef = useRef(null);
 
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    navigate('/aitutor'); // Navigate to the Developer page
+  };
+  
   const {
     transcript,
     listening,
@@ -398,8 +406,8 @@ function Blind() {
           <div className="flex justify-between h-16">
             <div className="flex space-x-8">
               <div className="flex-shrink-0 flex items-center">
-                <Brain className="h-8 w-8 text-blue-600" />
-                <span className="ml-2 text-xl font-bold">DeafTech Ed</span>
+                <img src={logo} alt="ShikshaSoladu Logo" className="h-8 w-8" />
+                <span className="ml-2 text-xl font-bold">ShikshaSoladu.ai</span>
               </div>
               <div className="hidden md:flex items-center space-x-4">
                 <button onClick={() => setActiveSection('learning')} className="flex items-center px-3 py-2 rounded-md hover:bg-gray-100">
@@ -422,9 +430,8 @@ function Blind() {
                   <FileText className="h-5 w-5 mr-1" />
                   PDF Reader
                 </button>
-                <button onClick={() => setActiveSection('developer')} className="flex items-center px-3 py-2 rounded-md hover:bg-gray-100">
-                  <Code2 className="h-5 w-5 mr-1" />
-                  Developer
+                <button onClick={handleClick} className="flex items-center px-3 py-2 rounded-md hover:bg-gray-100">
+                  <Code2 className="h-5 w-5 mr-1" />AI Tutor
                 </button>
               </div>
             </div>

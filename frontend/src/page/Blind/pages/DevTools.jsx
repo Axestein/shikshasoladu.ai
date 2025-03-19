@@ -6,7 +6,7 @@ import { Document, Page, pdfjs } from 'react-pdf';
 import DevTools from './DevTools';
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
-function Blind() {
+function DevTool() {
   const [activeSection, setActiveSection] = useState('home');
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [pdfText, setPdfText] = useState('');
@@ -489,4 +489,4 @@ function Blind() {
   );
 }
 
-export default Blind;
+export default DevTool;

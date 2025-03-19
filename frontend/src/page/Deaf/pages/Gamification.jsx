@@ -5,6 +5,7 @@ import Leaderboard from "../components/Leaderboard";
 import Badges from "../components/Badges";
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
+import FingerspellingChallenge from "../components/Fingerspell";
 
 export default function Gamification() {
   return (
@@ -19,8 +20,7 @@ export default function Gamification() {
         {/* Content */}
         <div className="space-y-8">
           <PuzzleGame />
-          <Leaderboard />
-          <Badges />
+          <FingerspellingChallenge />
         </div>
       </div>
     </div>
