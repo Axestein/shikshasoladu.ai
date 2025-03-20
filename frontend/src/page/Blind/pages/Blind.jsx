@@ -106,11 +106,11 @@ function Blind() {
   useEffect(() => {
     const voiceCommands = {
       'go to learning': () => setActiveSection('learning'),
-      'go to videos': () => setActiveSection('videos'),
-      'go to community': () => setActiveSection('community'),
-      'go to resources': () => setActiveSection('resources'),
+      'go to videos': () => handleClick('/blindvideos'),
+      'go to summary': () => setActiveSection('/yotubesummary'),
+      'go to games': () => handleClick('/game1'),
       'go to reader': () => setActiveSection('reader'),
-      'go to ai tutor': () => navigate('/aitutor'), // Use navigate for routing
+      'go to ai tutor': () => handleClick('/aitutor'),
       'go home': () => setActiveSection('home'),
       'read page': () => {
         const mainContent = document.querySelector('main').textContent;
@@ -161,14 +161,14 @@ function Blind() {
 
   const sections = {
     home: {
-      title: "Welcome to DeafTech Education Hub",
+      title: "Welcome to Blind Education Hub of ShikshaSoladu.ai",
       content: (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="bg-white p-6 rounded-lg shadow-lg">
             <h3 className="text-xl font-bold mb-4">Interactive Learning</h3>
-            <p>Engage with our cutting-edge educational tools designed specifically for deaf and hard-of-hearing students.</p>
+            <p>Engage with our cutting-edge educational tools designed specifically for blind and visually impaired students.</p>
             <button
-              onClick={() => speakText("Welcome to DeafTech Education Hub. This is an interactive learning platform.")}
+              onClick={() => speakText("Welcome to Blind Education Hub. This is an interactive learning platform.")}
               className="mt-4 flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
             >
               {isSpeaking ? <VolumeX className="mr-2" /> : <Volume2 className="mr-2" />}
@@ -415,17 +415,17 @@ function Blind() {
                   <Book className="h-5 w-5 mr-1" />
                   Learning
                 </button>
-                <button onClick={() => setActiveSection('videos')} className="flex items-center px-3 py-2 rounded-md hover:bg-gray-100">
+                <button onClick={() => handleClick('/blindvideos')} className="flex items-center px-3 py-2 rounded-md hover:bg-gray-100">
                   <Video className="h-5 w-5 mr-1" />
                   Videos
                 </button>
-                <button onClick={() => setActiveSection('community')} className="flex items-center px-3 py-2 rounded-md hover:bg-gray-100">
-                  <Users className="h-5 w-5 mr-1" />
-                  Community
-                </button>
-                <button onClick={() => setActiveSection('resources')} className="flex items-center px-3 py-2 rounded-md hover:bg-gray-100">
+                <button onClick={() => handleClick('/youtubesummary')} className="flex items-center px-3 py-2 rounded-md hover:bg-gray-100">
                   <MessageSquare className="h-5 w-5 mr-1" />
-                  Resources
+                  Get Summary
+                </button>
+                <button onClick={() => handleClick('/game1')} className="flex items-center px-3 py-2 rounded-md hover:bg-gray-100">
+                  <MessageSquare className="h-5 w-5 mr-1" />
+                  Gamification Learning
                 </button>
                 <button onClick={() => setActiveSection('reader')} className="flex items-center px-3 py-2 rounded-md hover:bg-gray-100">
                   <FileText className="h-5 w-5 mr-1" />
@@ -473,4 +473,4 @@ function Blind() {
   );
 }
 
-export default Blind;   
+export default Blind;

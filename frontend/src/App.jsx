@@ -22,6 +22,10 @@ import DevTool from "./page/Blind/components/DevTools";
 import CodeViewer from "./page/Blind/pages/CodeViewer";
 import Aitutor from "./page/Blind/components/Aitutor";
 import BlindNavbar from "./page/Blind/components/Navbar";
+import EnhancedVideoPlayer from "./page/Blind/components/Videos";
+import Games from "./page/Deaf/components/SentanceGames";
+import GeographyQuiz from "./page/Blind/components/Game1";
+import VoiceSearchAudioSummarizer from "./page/Blind/components/YoutubeSummary";
 
 export default function App() {
   return (
@@ -51,6 +55,10 @@ export default function App() {
         <Route path="/blindsubtitle" element={<SubtitleGenerator />} />
         <Route path="/aitutor" element={<Aitutor />} />
         <Route path="/blindnavbar" element={<BlindNavbar />} />
+        <Route path="/blindvideos" element={<EnhancedVideoPlayer />} />
+        <Route path="/game2" element={<Games />} />
+        <Route path="/game1" element={<GeographyQuiz />} />
+        <Route path="/youtubesummary" element={<VoiceSearchAudioSummarizer />} />
       </Routes>
     </Router>
   );

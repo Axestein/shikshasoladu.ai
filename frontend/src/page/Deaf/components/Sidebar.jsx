@@ -104,6 +104,14 @@ export default function Sidebar() {
                   {isSidebarOpen && <span>More Games</span>}
                 </Link>
               </li>
+              <li>
+                <Link
+                  to="/game2"
+                  className="text-white hover:text-yellow-300 flex items-center gap-2 transition duration-300 px-6 py-2"
+                >
+                  {isSidebarOpen && <span>Games</span>}
+                </Link>
+              </li>
             </ul>
           )}
         </li>
