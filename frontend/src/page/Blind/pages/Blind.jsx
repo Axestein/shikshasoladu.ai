@@ -107,7 +107,7 @@ function Blind() {
     const voiceCommands = {
       'go to learning': () => setActiveSection('learning'),
       'go to videos': () => handleClick('/blindvideos'),
-      'go to summary': () => setActiveSection('/yotubesummary'),
+      'go to summary': () => handleClick('/youtubesummary'),
       'go to games': () => handleClick('/game1'),
       'go to reader': () => setActiveSection('reader'),
       'go to ai tutor': () => handleClick('/aitutor'),
